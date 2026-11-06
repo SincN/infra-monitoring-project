@@ -1,0 +1,32 @@
+name: CI
+
+# Триггеримся на PR в main
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  bash-scripts:
+    name: Bash scripts — syntax & tests
+    runs-on: ubuntu-latest
+    steps:
+      # Качаем репозиторий
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Делаем скрипты исполняемыми
+      - name: Chmod
+        run: chmod +x ./scripts/check_api.sh ./scripts/analyze_logs.sh
+
+      # Проверяем синтаксис скриптов
+      - name: Syntax
+        run: |
+          bash -n ./scripts/check_api.sh
+          bash -n ./scripts/analyze_logs.sh
+          echo "Синтаксис скриптов корректен"
+
+      # Тестируем скрипт check_api.sh
+      - name: Test check_api.sh
+        run: |
+          ./scripts/check_api.sh https://httpbin.org/status/200
+          echo "OK"
